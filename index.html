@@ -17,64 +17,105 @@
   </main>
 
   <script>
-    function shuffle(arr) {
-      const a = arr.slice();
-      for (let i = a.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [a[i], a[j]] = [a[j], a[i]];
-      }
-      return a;
+  function shuffle(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
     }
+    return a;
+  }
 
-    function weightedPick(options) {
-      const total = options.reduce((s, o) => s + o.w, 0);
-      let r = Math.random() * total;
-      for (const o of options) {
-        r -= o.w;
-        if (r <= 0) return o.name;
-      }
-      return options[options.length - 1].name;
+  function weightedPick(options) {
+    const total = options.reduce((s, o) => s + o.w, 0);
+    let r = Math.random() * total;
+    for (const o of options) {
+      r -= o.w;
+      if (r <= 0) return o.name;
     }
+    return options[options.length - 1].name;
+  }
 
-    const sizeWeights = [
-      { name: "size-s", w: 25 },
-      { name: "size-m", w: 45 },
-      { name: "size-l", w: 20 },
-      { name: "size-w", w: 7  },
-      { name: "size-b", w: 3  }
-    ];
+  const sizeWeights = [
+    { name: "span-1", w: 80 },
+    { name: "span-2", w: 18 },
+    { name: "span-3", w: 2 }
+  ];
 
-    fetch(new URL("photos.json", window.location.href))
-      .then(r => r.json())
-      .then(files => {
-        const grid = document.getElementById("grid");
-        const frag = document.createDocumentFragment();
+  const lightbox = document.getElementById("lightbox");
+  const lbImage = document.querySelector(".lb-image");
+  const lbClose = document.querySelector(".lb-close");
 
-        shuffle(files).forEach(src => {
-          const a = document.createElement("a");
-          a.href = src;
-          a.target = "_blank";
-          a.rel = "noopener";
-          a.className = "tile " + weightedPick(sizeWeights);
+  let currentIndex = 0;
+  let images = [];
 
-          const img = document.createElement("img");
-          img.src = src;
-          img.loading = "lazy";
-          img.decoding = "async";
-          img.alt = "";
+  function openLightbox(index){
+    currentIndex = index;
+    lbImage.src = images[currentIndex];
+    lightbox.classList.add("open");
+    lightbox.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+  }
 
-          a.appendChild(img);
-          frag.appendChild(a);
+  function closeLightbox(){
+    lightbox.classList.remove("open");
+    lightbox.setAttribute("aria-hidden", "true");
+    lbImage.src = "";
+    document.body.style.overflow = "";
+  }
+
+  function showNext(dir){
+    currentIndex = (currentIndex + dir + images.length) % images.length;
+    lbImage.src = images[currentIndex];
+  }
+
+  lbClose.addEventListener("click", closeLightbox);
+  lightbox.addEventListener("click", e => {
+    if (e.target === lightbox) closeLightbox();
+  });
+
+  document.addEventListener("keydown", e => {
+    if (!lightbox.classList.contains("open")) return;
+    if (e.key === "Escape") closeLightbox();
+    if (e.key === "ArrowRight") showNext(1);
+    if (e.key === "ArrowLeft") showNext(-1);
+  });
+
+  fetch(new URL("photos.json", window.location.href))
+    .then(r => r.json())
+    .then(files => {
+      images = shuffle(files);
+      const grid = document.getElementById("grid");
+      const frag = document.createDocumentFragment();
+
+      images.forEach((src, i) => {
+        const a = document.createElement("a");
+        a.href = src;
+        a.className = "tile " + weightedPick(sizeWeights);
+        a.addEventListener("click", e => {
+          e.preventDefault();
+          openLightbox(i);
         });
 
-        grid.appendChild(frag);
-      })
-      .catch(err => {
-        document.getElementById("grid").innerHTML =
-          "<p>photos.json not found – run build.js</p>";
-        console.error(err);
+        const img = document.createElement("img");
+        img.src = src;
+        img.loading = "lazy";
+        img.decoding = "async";
+        img.alt = "";
+
+        a.appendChild(img);
+        frag.appendChild(a);
       });
-  </script>
+
+      grid.appendChild(frag);
+    })
+    .catch(err => {
+      document.getElementById("grid").innerHTML =
+        "<p>Couldn’t load photos.json.</p>";
+      console.error(err);
+    });
+</script>
+
 
 </body>
 </html>
