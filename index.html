@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Photos</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <header class="header">
+    <h1>Photos</h1>
+  </header>
+
+  <main class="wrap">
+    <div id="grid" class="grid"></div>
+  </main>
+
+  <script>
+    function shuffle(arr) {
+      const a = arr.slice();
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    function weightedPick(options) {
+      const total = options.reduce((s, o) => s + o.w, 0);
+      let r = Math.random() * total;
+      for (const o of options) {
+        r -= o.w;
+        if (r <= 0) return o.name;
+      }
+      return options[options.length - 1].name;
+    }
+
+    const sizeWeights = [
+      { name: "size-s", w: 25 },
+      { name: "size-m", w: 45 },
