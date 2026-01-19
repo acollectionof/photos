@@ -1,0 +1,73 @@
+:root{
+  --gap: 10px;
+  --max: 1400px;
+}
+
+*{ box-sizing:border-box; }
+
+body{
+  margin:0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  background:#fff;
+  color:#111;
+}
+
+.header{
+  position: sticky;
+  top:0;
+  background: rgba(255,255,255,.85);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid #eee;
+  padding: 12px 16px;
+}
+
+.wrap{
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.grid{
+  display:grid;
+  gap: var(--gap);
+  grid-auto-flow: dense;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  grid-auto-rows: 90px;
+}
+
+.tile{
+  display:block;
+  overflow:hidden;
+  border-radius: 10px;
+  background:#f5f5f5;
+}
+
+.tile img{
+  width:100%;
+  height:100%;
+  object-fit: cover;
+  display:block;
+  transform: scale(1.001);
+  transition: transform 160ms ease;
+}
+
+.tile:hover img{
+  transform: scale(1.03);
+}
+
+/* Size variations */
+.size-s{ grid-column: span 1; grid-row: span 2; }
+.size-m{ grid-column: span 1; grid-row: span 3; }
+.size-l{ grid-column: span 1; grid-row: span 4; }
+.size-w{ grid-column: span 2; grid-row: span 3; }
+.size-b{ grid-column: span 2; grid-row: span 5; }
+
+@media (max-width: 520px){
+  .grid{
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .size-w,
+  .size-b{
+    grid-column: span 2;
+  }
+}
