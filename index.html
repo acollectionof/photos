@@ -44,9 +44,11 @@
       { name: "size-b", w: 3  }
     ];
 
-    fetch("./photos.json")
-      .then(r => r.json())
-      .then(files => {
+   fetch(new URL("photos.json", window.location.href))
+  .then(r => r.json())
+  .then(files => { /* ... */ })
+  .catch(err => { /* ... */ });
+
         const grid = document.getElementById("grid");
         const frag = document.createDocumentFragment();
 
