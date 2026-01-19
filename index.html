@@ -39,3 +39,42 @@
     const sizeWeights = [
       { name: "size-s", w: 25 },
       { name: "size-m", w: 45 },
+      { name: "size-l", w: 20 },
+      { name: "size-w", w: 7  },
+      { name: "size-b", w: 3  }
+    ];
+
+    fetch("./photos.json")
+      .then(r => r.json())
+      .then(files => {
+        const grid = document.getElementById("grid");
+        const frag = document.createDocumentFragment();
+
+        shuffle(files).forEach(src => {
+          const a = document.createElement("a");
+          a.href = src;
+          a.target = "_blank";
+          a.rel = "noopener";
+          a.className = "tile " + weightedPick(sizeWeights);
+
+          const img = document.createElement("img");
+          img.src = src;
+          img.loading = "lazy";
+          img.decoding = "async";
+          img.alt = "";
+
+          a.appendChild(img);
+          frag.appendChild(a);
+        });
+
+        grid.appendChild(frag);
+      })
+      .catch(err => {
+        document.getElementById("grid").innerHTML =
+          "<p>photos.json not found – run build.js</p>";
+        console.error(err);
+      });
+  </script>
+
+</body>
+</html>
